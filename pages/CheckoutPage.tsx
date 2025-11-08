@@ -104,7 +104,7 @@ const CheckoutPage: React.FC = () => {
                                             <img src={item.product.images[0]} alt={item.product.name} className="w-16 h-16 object-cover rounded-md" />
                                             <div>
                                                 <h3 className="font-semibold">{item.product.name}</h3>
-                                                <p className="text-sm text-gray-400">${(item.product.discountPrice || item.product.price).toFixed(2)}</p>
+                                                <p className="text-sm text-gray-400">৳{(item.product.discountPrice || item.product.price).toFixed(2)}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
@@ -115,7 +115,7 @@ const CheckoutPage: React.FC = () => {
                                 ))}
                             </div>
                              <div className="mt-6 text-right">
-                                <p className="text-2xl font-bold">Subtotal: <span className="text-accent-cyan">${subtotal.toFixed(2)}</span></p>
+                                <p className="text-2xl font-bold">Subtotal: <span className="text-accent-cyan">৳{subtotal.toFixed(2)}</span></p>
                             </div>
                         </div>
                     </div>

@@ -33,11 +33,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
                     <div>
                         {product.discountPrice ? (
                             <div className="flex items-baseline space-x-2">
-                                <p className="text-2xl font-bold text-accent-cyan">${product.discountPrice.toFixed(2)}</p>
-                                <p className="text-md text-gray-500 line-through">${product.price.toFixed(2)}</p>
+                                <p className="text-2xl font-bold text-accent-cyan">৳{product.discountPrice.toFixed(2)}</p>
+                                <p className="text-md text-gray-500 line-through">৳{product.price.toFixed(2)}</p>
                             </div>
                         ) : (
-                            <p className="text-2xl font-bold text-accent-cyan">${product.price.toFixed(2)}</p>
+                            <p className="text-2xl font-bold text-accent-cyan">৳{product.price.toFixed(2)}</p>
                         )}
                     </div>
                     <button 

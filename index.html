@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -23,6 +22,15 @@
             boxShadow: {
               'glow-pink': '0 0 15px rgba(255, 0, 168, 0.6)',
               'glow-cyan': '0 0 15px rgba(0, 240, 255, 0.6)',
+            },
+            animation: {
+              'scroll': 'scroll 40s linear infinite',
+            },
+            keyframes: {
+              scroll: {
+                '0%': { transform: 'translateX(0)' },
+                '100%': { transform: 'translateX(-100%)' },
+              }
             }
           }
         }

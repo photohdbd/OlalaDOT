@@ -100,11 +100,11 @@ const ProductDetailPage: React.FC = () => {
                     <div className="my-6">
                         {product.discountPrice ? (
                             <div className="flex items-baseline space-x-3">
-                                <p className="text-4xl font-bold text-accent-cyan">${product.discountPrice.toFixed(2)}</p>
-                                <p className="text-2xl text-gray-500 line-through">${product.price.toFixed(2)}</p>
+                                <p className="text-4xl font-bold text-accent-cyan">৳{product.discountPrice.toFixed(2)}</p>
+                                <p className="text-2xl text-gray-500 line-through">৳{product.price.toFixed(2)}</p>
                             </div>
                         ) : (
-                            <p className="text-4xl font-bold text-accent-cyan">${product.price.toFixed(2)}</p>
+                            <p className="text-4xl font-bold text-accent-cyan">৳{product.price.toFixed(2)}</p>
                         )}
                     </div>
                     
@@ -140,7 +140,7 @@ const ProductDetailPage: React.FC = () => {
                                 <Link to={`/product/${p.id}`}>
                                     <img src={p.images[0]} alt={p.name} className="w-full h-40 object-cover rounded-md mb-4" />
                                     <h3 className="font-semibold hover:text-accent-cyan transition-colors">{p.name}</h3>
-                                    <p className="text-accent-cyan font-bold mt-2">${(p.discountPrice || p.price).toFixed(2)}</p>
+                                    <p className="text-accent-cyan font-bold mt-2">৳{(p.discountPrice || p.price).toFixed(2)}</p>
                                 </Link>
                             </div>
                         ))}

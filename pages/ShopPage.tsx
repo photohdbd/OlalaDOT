@@ -8,7 +8,7 @@ const ShopPage: React.FC = () => {
     const { state, dispatch } = useContext(AppContext) as AppContextType;
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
-    const [priceRange, setPriceRange] = useState(300);
+    const [priceRange, setPriceRange] = useState(50000);
 
     const handleAddToCart = (product: Product) => {
         dispatch({ type: 'ADD_TO_CART', payload: product });
@@ -56,14 +56,14 @@ const ShopPage: React.FC = () => {
                 </div>
                 <div className="w-full md:w-1/3">
                     <label htmlFor="price-range" className="block text-sm font-medium text-gray-300 mb-2">
-                        Max Price: ${priceRange}
+                        Max Price: ৳{priceRange}
                     </label>
                     <input
                         id="price-range"
                         type="range"
                         min="0"
-                        max="300"
-                        step="10"
+                        max="50000"
+                        step="100"
                         value={priceRange}
                         onChange={(e) => setPriceRange(Number(e.target.value))}
                         className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-accent-cyan"

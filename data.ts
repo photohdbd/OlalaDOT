@@ -99,130 +99,15 @@ export type Action =
   | { type: 'ADD_PRODUCT_REQUEST'; payload: Omit<ProductRequest, 'id' | 'date'> };
 
 
-export const initialProducts: Product[] = [
-    {
-        id: 1,
-        name: 'Premium Graphics Bundle',
-        description: 'A massive collection of over 10,000 premium graphics resources, including vectors, icons, and templates. Perfect for designers and content creators.',
-        price: 49.99,
-        discountPrice: 29.99,
-        discountEndDate: new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000),
-        images: ['https://picsum.photos/seed/gfx1/800/600', 'https://picsum.photos/seed/gfx2/800/600'],
-        category: 'Graphics Resources',
-        tags: ['Graphics Tools', 'VIP', 'Sale'],
-        isFeatured: true,
-        isLive: true,
-        stock: 100,
-        digitalFile: 'DOWNLOAD_LINK_OR_CODE_FOR_GFX_BUNDLE'
-    },
-    {
-        id: 2,
-        name: 'Streaming Service 1-Year Subscription',
-        description: 'Enjoy unlimited access to thousands of movies and TV shows with this 1-year subscription to our premium streaming service.',
-        price: 120.00,
-        images: ['https://picsum.photos/seed/stream1/800/600', 'https://picsum.photos/seed/stream2/800/600'],
-        category: 'Subscription',
-        tags: ['Subscription', 'Entertainment'],
-        isFeatured: true,
-        isLive: true,
-        stock: 50,
-        digitalFile: 'ACTIVATION_KEY: XXXX-YYYY-ZZZZ-AAAA'
-    },
-    {
-        id: 3,
-        name: 'Ultimate Developer Software Pack',
-        description: 'A suite of essential software for developers, including IDEs, testing tools, and project management applications.',
-        price: 250.00,
-        discountPrice: 199.99,
-        discountEndDate: new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
-        images: ['https://picsum.photos/seed/dev1/800/600'],
-        category: 'Software',
-        tags: ['Software', 'Development', 'VIP'],
-        isFeatured: false,
-        isLive: true,
-        stock: 30,
-        digitalFile: 'LICENSE_KEY_FOR_DEV_PACK: DEV-123-ABC-456'
-    },
-    {
-        id: 4,
-        name: '$50 Universal Gift Card',
-        description: 'The perfect gift for any occasion. This gift card can be redeemed for any product on our site.',
-        price: 50.00,
-        images: ['https://picsum.photos/seed/gift1/800/600'],
-        category: 'Gift Card',
-        tags: ['Gift Card', 'New'],
-        isFeatured: true,
-        isLive: true,
-        stock: 200,
-        digitalFile: 'GIFT_CARD_CODE: OLALA-GIFT-50-XYZ'
-    },
-    {
-        id: 5,
-        name: 'Educational Combo Pack',
-        description: 'Access to over 200 online courses on various subjects, from programming to digital marketing. A complete learning solution.',
-        price: 99.99,
-        images: ['https://picsum.photos/seed/edu1/800/600', 'https://picsum.photos/seed/edu2/800/600'],
-        category: 'Education',
-        tags: ['Educational Combo', 'Learning'],
-        isFeatured: true,
-        isLive: true,
-        stock: 100,
-        digitalFile: 'ACCESS_INSTRUCTIONS_AND_LOGIN_FOR_EDU_PACK'
-    },
-     {
-        id: 6,
-        name: 'Pro Video Editing Software',
-        description: 'Industry-standard video editing software with advanced features like 4K support, motion tracking, and color grading.',
-        price: 299.00,
-        images: ['https://picsum.photos/seed/video1/800/600'],
-        category: 'Software',
-        tags: ['Software', 'Video Editing'],
-        isFeatured: true,
-        isLive: true,
-        stock: 45,
-        digitalFile: 'SERIAL_NUMBER_FOR_VIDEO_SOFTWARE: VID-PRO-987-ZYX'
-    }
-];
+export const initialProducts: Product[] = [];
 
-export const initialOrders: Order[] = [
-    {
-        id: 'ORD-12345',
-        userId: 1,
-        customer: { name: 'Rohan Ahmed', email: 'rohan@example.com', phone: '01712345678', address: 'Dhaka, Bangladesh' },
-        items: [{ product: initialProducts[0], quantity: 1 }, { product: initialProducts[3], quantity: 2 }],
-        total: 29.99 + (50 * 2),
-        paymentMethod: 'bKash',
-        transactionId: 'BK123XYZ',
-        status: 'Delivered',
-        date: new Date(new Date().setDate(new Date().getDate() - 5)),
-    },
-    {
-        id: 'ORD-12346',
-        userId: 2,
-        customer: { name: 'Farah Islam', email: 'farah@example.com', phone: '01812345678', address: 'Chittagong, Bangladesh' },
-        items: [{ product: initialProducts[1], quantity: 1 }],
-        total: 120.00,
-        paymentMethod: 'Nagad',
-        transactionId: 'NG456ABC',
-        status: 'Processing',
-        date: new Date(new Date().setDate(new Date().getDate() - 2)),
-    }
-];
+export const initialOrders: Order[] = [];
 
-export const initialHeroSlides: HeroSlide[] = [
-    { id: 1, imageUrl: 'https://picsum.photos/seed/slide1/1200/600', title: 'Biggest Sale of the Year', subtitle: 'Get up to 50% off on all software packs!', link: '/shop' },
-    { id: 2, imageUrl: 'https://picsum.photos/seed/slide2/1200/600', title: 'New Arrivals: Gift Cards', subtitle: 'The perfect gift for any occasion.', link: '/shop' },
-    { id: 3, imageUrl: 'https://picsum.photos/seed/slide3/1200/600', title: 'Exclusive Graphics Bundles', subtitle: 'Unlock your creativity with our premium resources.', link: '/shop' },
-];
+export const initialHeroSlides: HeroSlide[] = [];
 
-export const initialUsers: User[] = [
-    { id: 1, name: 'Customer One', email: 'customer1@example.com', phone: '01111111111', address: 'Dhaka', password: 'password123' },
-    { id: 2, name: 'Customer Two', email: 'customer2@example.com', phone: '02222222222', address: 'Chittagong', password: 'password123' },
-];
+export const initialUsers: User[] = [];
 
-export const initialProductRequests: ProductRequest[] = [
-    { id: 1, name: 'Test User', email: 'test@example.com', message: 'I would love to see a pro-level audio editing suite available.', date: new Date() }
-];
+export const initialProductRequests: ProductRequest[] = [];
 
 export const staticPageContent = {
   about: {

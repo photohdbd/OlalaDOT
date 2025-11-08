@@ -6,7 +6,7 @@ import ProductCard from '../components/ProductCard';
 import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons';
 
 const TestimonialCard: React.FC<{ author: string; text: string }> = ({ author, text }) => (
-    <div className="bg-secondary p-8 rounded-lg border border-gray-800 h-full flex flex-col">
+    <div className="bg-secondary p-8 rounded-lg border border-gray-800 flex flex-col w-80 md:w-96 mx-4 flex-shrink-0">
         <p className="text-gray-300 flex-grow">"{text}"</p>
         <p className="font-bold text-accent-cyan mt-4">- {author}</p>
     </div>
@@ -15,7 +15,6 @@ const TestimonialCard: React.FC<{ author: string; text: string }> = ({ author, t
 const HomePage: React.FC = () => {
     const { state, dispatch } = useContext(AppContext) as AppContextType;
     const [heroIndex, setHeroIndex] = useState(0);
-    const [testimonialIndex, setTestimonialIndex] = useState(0);
 
     const { heroSlides } = state;
     const featuredProducts = state.products.filter(p => p.isFeatured && p.isLive).slice(0, 4);
@@ -25,10 +24,12 @@ const HomePage: React.FC = () => {
     };
 
     const nextHeroSlide = useCallback(() => {
+        if (heroSlides.length === 0) return;
         setHeroIndex((prev) => (prev + 1) % heroSlides.length);
     }, [heroSlides.length]);
 
     const prevHeroSlide = () => {
+        if (heroSlides.length === 0) return;
         setHeroIndex((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
     };
 
@@ -40,38 +41,34 @@ const HomePage: React.FC = () => {
     }, [heroSlides.length, nextHeroSlide]);
 
     const testimonials = [
-        { author: "Anik Ahmed", text: "Incredible collection of digital goods! Found exactly what I needed for my project at a great price. The delivery was super fast." },
-        { author: "Sadia Rahman", text: "OlalaDOT is my go-to for software subscriptions. The process is seamless and the customer support is top-notch. Highly recommended!" },
-        { author: "Imran Khan", text: "Finally, a reliable site for digital products in Bangladesh. 'Ajab Site Ka Gajab Jinis' truly fits!" }
+        { author: "Anik Ahmed", text: "অসাধারণ কালেকশন! আমার প্রজেক্টের জন্য যা যা দরকার ছিল, সবই পেয়েছি এখানে। ডেলিভারিও ছিল খুব ফাস্ট।" },
+        { author: "Sadia Rahman", text: "OlalaDOT is my go-to for software subscriptions. The process is seamless and their support is top-notch. Highly recommended!" },
+        { author: "Imran Khan", text: "Finally, a reliable site for digital products in Bangladesh. আসলেই 'Ajab Site Ka Gajab Jinis'!" },
+        { author: "Farhana Chowdhury", text: "The graphics bundle I purchased exceeded my expectations. অনেক প্রিমিয়াম রিসোর্স পেয়েছি। ধন্যবাদ OlalaDOT!" },
+        { author: "Rajib Hasan", text: "A great platform with a user-friendly interface. I found their educational combo pack very helpful for upskilling." }
     ];
-
-    const nextTestimonial = useCallback(() => {
-        setTestimonialIndex((prev) => (prev + 1) % testimonials.length);
-    }, [testimonials.length]);
-
-     useEffect(() => {
-        const testimonialInterval = setInterval(nextTestimonial, 7000);
-        return () => clearInterval(testimonialInterval);
-    }, [nextTestimonial]);
-
-
-    const categories = [...new Set(state.products.map(p => p.category))];
 
     return (
         <div className="space-y-24 pb-24">
             {/* Hero Section */}
             <section className="relative overflow-hidden bg-primary h-[60vh] min-h-[500px] flex items-center justify-center text-center text-white">
                 <div className="absolute inset-0 w-full h-full">
-                    {heroSlides.map((slide, index) => (
+                    {heroSlides.length > 0 ? heroSlides.map((slide, index) => (
                         <div key={slide.id} className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ${index === heroIndex ? 'opacity-100' : 'opacity-0'}`}>
                             <img src={slide.imageUrl} alt={slide.title} className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-black/60"></div>
                         </div>
-                    ))}
+                    )) : (
+                         <div className="absolute inset-0 w-full h-full bg-secondary"></div>
+                    )}
                 </div>
 
-                <button onClick={prevHeroSlide} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors"><ChevronLeftIcon /></button>
-                <button onClick={nextHeroSlide} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors"><ChevronRightIcon /></button>
+                {heroSlides.length > 1 && (
+                    <>
+                        <button onClick={prevHeroSlide} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors"><ChevronLeftIcon /></button>
+                        <button onClick={nextHeroSlide} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors"><ChevronRightIcon /></button>
+                    </>
+                )}
 
                 <div className="relative z-10 p-4">
                      <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white animate-fade-in-down">
@@ -93,24 +90,15 @@ const HomePage: React.FC = () => {
             {/* Featured Products Grid */}
             <section className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 className="text-3xl font-bold text-center mb-12">Featured Products</h2>
-                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {featuredProducts.map(product => (
-                        <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
-                    ))}
-                </div>
-            </section>
-
-            {/* Category Explorer */}
-            <section className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-3xl font-bold text-center mb-12">Explore Categories</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-                    {categories.map(category => (
-                        <Link to={`/shop?category=${category}`} key={category} className="group relative block p-8 text-center bg-secondary rounded-lg overflow-hidden border border-gray-800 hover:border-accent-cyan transition-colors duration-300">
-                             <div className="absolute inset-0 bg-gradient-to-br from-accent-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <h3 className="relative text-xl font-semibold">{category}</h3>
-                        </Link>
-                    ))}
-                </div>
+                {featuredProducts.length > 0 ? (
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {featuredProducts.map(product => (
+                            <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-center text-gray-400">No featured products available yet.</p>
+                )}
             </section>
 
             {/* How to Buy */}
@@ -136,17 +124,14 @@ const HomePage: React.FC = () => {
             </section>
 
             {/* Testimonials */}
-            <section className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="py-16">
                 <h2 className="text-3xl font-bold text-center mb-12">What Our Clients Say</h2>
-                 <div className="relative overflow-hidden max-w-2xl mx-auto h-48">
-                    {testimonials.map((testimonial, index) => (
-                        <div
-                            key={index}
-                            className={`absolute w-full transition-opacity duration-1000 ease-in-out ${index === testimonialIndex ? 'opacity-100' : 'opacity-0'}`}
-                        >
-                            <TestimonialCard author={testimonial.author} text={testimonial.text} />
-                        </div>
-                    ))}
+                <div className="relative w-full overflow-hidden group">
+                     <div className="flex animate-scroll group-hover:[animation-play-state:paused]">
+                        {testimonials.concat(testimonials).map((testimonial, index) => (
+                           <TestimonialCard key={index} author={testimonial.author} text={testimonial.text} />
+                        ))}
+                    </div>
                 </div>
             </section>
         </div>

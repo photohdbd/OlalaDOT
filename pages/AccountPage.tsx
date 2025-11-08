@@ -18,7 +18,7 @@ const OrderItem: React.FC<{order: Order}> = ({ order }) => {
                     <p className="text-sm text-gray-400">{new Date(order.date).toLocaleDateString()}</p>
                 </div>
                 <div>
-                    <p className="font-bold text-white">${order.total.toFixed(2)}</p>
+                    <p className="font-bold text-white">৳{order.total.toFixed(2)}</p>
                     <p className={`text-sm text-right font-semibold ${
                         order.status === 'Delivered' ? 'text-green-500' : 
                         order.status === 'Processing' ? 'text-yellow-500' : 'text-gray-400'
