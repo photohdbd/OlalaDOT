@@ -2,18 +2,23 @@ import React, { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../App';
 import { AppContextType, Order } from '../data';
 import { TrashIcon } from '../components/Icons';
+import { useNavigate, Link } from 'react-router-dom';
 
 const CheckoutPage: React.FC = () => {
     const { state, dispatch } = useContext(AppContext) as AppContextType;
-    const { cart, currentUser } = state;
-    const [paymentMethod, setPaymentMethod] = useState<'bKash' | 'Nagad' | 'Rocket' | 'Upay' | 'COD'>('bKash');
+    const { cart, currentUser, isAuthenticated } = state;
+    const navigate = useNavigate();
+
+    const [paymentMethod, setPaymentMethod] = useState<'bKash' | 'Nagad' | 'Rocket' | 'Upay'>('bKash');
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [formData, setFormData] = useState({
         name: '', email: '', phone: '', address: '', transactionId: ''
     });
 
     useEffect(() => {
-        if (currentUser) {
+        if (!isAuthenticated) {
+            navigate('/account', { state: { message: 'You must log in to proceed to checkout.' } });
+        } else if (currentUser) {
             setFormData(prev => ({
                 ...prev,
                 name: currentUser.name || '',
@@ -22,7 +27,7 @@ const CheckoutPage: React.FC = () => {
                 address: currentUser.address || '',
             }));
         }
-    }, [currentUser]);
+    }, [isAuthenticated, currentUser, navigate]);
 
     const handleQuantityChange = (productId: number, quantity: number) => {
         dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
@@ -40,10 +45,11 @@ const CheckoutPage: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (cart.length === 0) return;
+        if (cart.length === 0 || !currentUser) return;
         
         const newOrder: Order = {
             id: `ORD-${Date.now()}`,
+            userId: currentUser.id,
             customer: {
                 name: formData.name,
                 email: formData.email,
@@ -53,7 +59,7 @@ const CheckoutPage: React.FC = () => {
             items: cart,
             total: subtotal,
             paymentMethod,
-            transactionId: paymentMethod !== 'COD' ? formData.transactionId : undefined,
+            transactionId: formData.transactionId,
             status: 'Pending',
             date: new Date(),
         };
@@ -63,13 +69,18 @@ const CheckoutPage: React.FC = () => {
         setOrderPlaced(true);
     };
 
+    if (!isAuthenticated) {
+        return null; // or a loading spinner, as the redirect will happen
+    }
+
     if (orderPlaced) {
         return (
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center flex flex-col items-center">
                 <div className="bg-secondary p-10 rounded-lg shadow-2xl shadow-accent-cyan/20 max-w-lg">
                     <h2 className="text-3xl font-bold text-accent-cyan mb-4">Order Received!</h2>
                     <p className="text-lg text-gray-300">Thank you for your purchase.</p>
-                    <p className="text-gray-400 mt-2">Within 2-4 hours your order update will be sent to your email.</p>
+                    <p className="text-gray-400 mt-2">Within 2-4 hours your order update will be sent to your email. You can also track status in your account.</p>
+                    <Link to="/account" className="mt-6 inline-block bg-accent-cyan text-black font-bold py-2 px-6 rounded-lg">View My Orders</Link>
                 </div>
             </div>
         );
@@ -119,17 +130,15 @@ const CheckoutPage: React.FC = () => {
                                 
                                 <h3 className="font-semibold pt-4">Payment Method</h3>
                                 <div className="grid grid-cols-2 gap-2">
-                                    {['bKash', 'Nagad', 'Rocket', 'Upay', 'COD'].map(method => (
+                                    {['bKash', 'Nagad', 'Rocket', 'Upay'].map(method => (
                                         <button key={method} type="button" onClick={() => setPaymentMethod(method as any)} className={`p-2 rounded-md text-sm transition-colors ${paymentMethod === method ? 'bg-accent-cyan text-black' : 'bg-primary hover:bg-gray-800'}`}>{method}</button>
                                     ))}
                                 </div>
 
-                                {paymentMethod !== 'COD' && (
-                                    <div className="pt-2">
-                                        <p className="text-sm text-gray-400 mb-2">Send money to: <span className="font-mono text-accent-cyan">01234567890</span> ({paymentMethod})</p>
-                                        <input type="text" name="transactionId" placeholder="Transaction ID" onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
-                                    </div>
-                                )}
+                                <div className="pt-2">
+                                    <p className="text-sm text-gray-400 mb-2">Send money to: <span className="font-mono text-accent-cyan">01234567890</span> ({paymentMethod})</p>
+                                    <input type="text" name="transactionId" placeholder="Transaction ID" onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
+                                </div>
                                 
                                 <button type="submit" className="w-full bg-gradient-to-r from-accent-pink to-accent-purple text-white font-bold py-4 px-6 rounded-lg mt-4 transition-all duration-300 transform hover:scale-105 hover:shadow-glow-pink">
                                     Place Order

@@ -13,6 +13,7 @@ export type Product = {
   isFeatured: boolean;
   isLive: boolean;
   stock: number;
+  digitalFile?: string; // Link or code to be delivered
 };
 
 export type CartItem = {
@@ -22,6 +23,7 @@ export type CartItem = {
 
 export type Order = {
   id: string;
+  userId: number; // Link order to a user
   customer: {
     name: string;
     email: string;
@@ -46,7 +48,7 @@ export type HeroSlide = {
 
 export type User = {
   id: number;
-  name: string;
+  name:string;
   email: string;
   phone: string;
   address: string;
@@ -70,6 +72,7 @@ export type AppState = {
   productRequests: ProductRequest[];
   isAuthenticated: boolean;
   currentUser: User | null;
+  isAdminAuthenticated: boolean;
 };
 
 export type AppContextType = {
@@ -92,6 +95,7 @@ export type Action =
   | { type: 'REGISTER_USER'; payload: User }
   | { type: 'SET_CURRENT_USER'; payload: User | null }
   | { type: 'LOGOUT' }
+  | { type: 'SET_ADMIN_AUTH'; payload: boolean }
   | { type: 'ADD_PRODUCT_REQUEST'; payload: Omit<ProductRequest, 'id' | 'date'> };
 
 
@@ -109,6 +113,7 @@ export const initialProducts: Product[] = [
         isFeatured: true,
         isLive: true,
         stock: 100,
+        digitalFile: 'DOWNLOAD_LINK_OR_CODE_FOR_GFX_BUNDLE'
     },
     {
         id: 2,
@@ -121,6 +126,7 @@ export const initialProducts: Product[] = [
         isFeatured: true,
         isLive: true,
         stock: 50,
+        digitalFile: 'ACTIVATION_KEY: XXXX-YYYY-ZZZZ-AAAA'
     },
     {
         id: 3,
@@ -135,6 +141,7 @@ export const initialProducts: Product[] = [
         isFeatured: false,
         isLive: true,
         stock: 30,
+        digitalFile: 'LICENSE_KEY_FOR_DEV_PACK: DEV-123-ABC-456'
     },
     {
         id: 4,
@@ -147,6 +154,7 @@ export const initialProducts: Product[] = [
         isFeatured: true,
         isLive: true,
         stock: 200,
+        digitalFile: 'GIFT_CARD_CODE: OLALA-GIFT-50-XYZ'
     },
     {
         id: 5,
@@ -159,6 +167,7 @@ export const initialProducts: Product[] = [
         isFeatured: true,
         isLive: true,
         stock: 100,
+        digitalFile: 'ACCESS_INSTRUCTIONS_AND_LOGIN_FOR_EDU_PACK'
     },
      {
         id: 6,
@@ -171,12 +180,14 @@ export const initialProducts: Product[] = [
         isFeatured: true,
         isLive: true,
         stock: 45,
+        digitalFile: 'SERIAL_NUMBER_FOR_VIDEO_SOFTWARE: VID-PRO-987-ZYX'
     }
 ];
 
 export const initialOrders: Order[] = [
     {
         id: 'ORD-12345',
+        userId: 1,
         customer: { name: 'Rohan Ahmed', email: 'rohan@example.com', phone: '01712345678', address: 'Dhaka, Bangladesh' },
         items: [{ product: initialProducts[0], quantity: 1 }, { product: initialProducts[3], quantity: 2 }],
         total: 29.99 + (50 * 2),
@@ -187,6 +198,7 @@ export const initialOrders: Order[] = [
     },
     {
         id: 'ORD-12346',
+        userId: 2,
         customer: { name: 'Farah Islam', email: 'farah@example.com', phone: '01812345678', address: 'Chittagong, Bangladesh' },
         items: [{ product: initialProducts[1], quantity: 1 }],
         total: 120.00,
@@ -224,8 +236,8 @@ export const staticPageContent = {
   faq: {
     title: "Frequently Asked Questions",
     content: [
-      { q: "How do I receive my digital product?", a: "Once your order is confirmed and payment is verified, you will receive an email within 2-4 hours containing the product details, download links, or activation keys." },
-      { q: "What payment methods do you accept?", a: "We accept bKash, Nagad, Rocket, Upay, and Cash on Delivery for specific physical products where applicable." },
+      { q: "How do I receive my digital product?", a: "Once your order is confirmed and payment is verified, you will receive an email within 2-4 hours containing the product details. You can also access your purchased content directly from your 'My Account' page after the order is marked as delivered." },
+      { q: "What payment methods do you accept?", a: "We accept bKash, Nagad, Rocket, and Upay. You must be logged in to place an order." },
       { q: "What is your refund policy?", a: "Please refer to our Refund Policy page for detailed information. Generally, due to the nature of digital products, refunds are handled on a case-by-case basis." }
     ]
   },

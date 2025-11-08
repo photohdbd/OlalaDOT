@@ -1,22 +1,20 @@
-import React, { useState, useContext, FormEvent } from 'react';
+import React, { useState, useContext, FormEvent, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AppContext } from '../App';
 import { AppContextType, Product, Order, HeroSlide } from '../data';
 
 const AdminPage: React.FC = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { state, dispatch } = useContext(AppContext) as AppContextType;
+    const { isAdminAuthenticated } = state;
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { state, dispatch } = useContext(AppContext) as AppContextType;
-    const [activeTab, setActiveTab] = useState('orders');
+    const [activeTab, setActiveTab] = useState('dashboard');
     
-    // State for Add Product Form
     const [showAddProduct, setShowAddProduct] = useState(false);
     const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
-        name: '', description: '', price: 0, category: '', images: [], tags: [], isFeatured: false, isLive: true, stock: 0
+        name: '', description: '', price: 0, discountPrice: undefined, discountEndDate: undefined, category: '', images: [], tags: [], isFeatured: false, isLive: true, stock: 0, digitalFile: ''
     });
     
-    // State for Add Hero Slide Form
     const [newSlide, setNewSlide] = useState<Omit<HeroSlide, 'id'>>({
         imageUrl: '', title: '', subtitle: '', link: ''
     });
@@ -24,11 +22,15 @@ const AdminPage: React.FC = () => {
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
         if (password === 'password') {
-            setIsLoggedIn(true);
+            dispatch({ type: 'SET_ADMIN_AUTH', payload: true });
             setError('');
         } else {
             setError('Invalid password.');
         }
+    };
+    
+    const handleLogout = () => {
+        dispatch({ type: 'SET_ADMIN_AUTH', payload: false });
     };
     
     const handleStatusChange = (orderId: string, status: Order['status']) => {
@@ -44,12 +46,14 @@ const AdminPage: React.FC = () => {
         const productToAdd: Product = {
             ...newProduct,
             id: Date.now(),
+            price: Number(newProduct.price),
+            discountPrice: newProduct.discountPrice ? Number(newProduct.discountPrice) : undefined,
             tags: typeof newProduct.tags === 'string' ? (newProduct.tags as string).split(',').map(t => t.trim()) : [],
-            images: typeof newProduct.images === 'string' ? [newProduct.images] : []
+            images: typeof newProduct.images === 'string' ? (newProduct.images as string).split(',').map(i => i.trim()) : []
         };
         dispatch({ type: 'ADD_PRODUCT', payload: productToAdd });
         setShowAddProduct(false);
-        setNewProduct({ name: '', description: '', price: 0, category: '', images: [], tags: [], isFeatured: false, isLive: true, stock: 0 });
+        setNewProduct({ name: '', description: '', price: 0, discountPrice: undefined, discountEndDate: undefined, category: '', images: [], tags: [], isFeatured: false, isLive: true, stock: 0, digitalFile: '' });
     };
 
     const handleAddSlideSubmit = (e: FormEvent) => {
@@ -57,8 +61,21 @@ const AdminPage: React.FC = () => {
         dispatch({ type: 'ADD_HERO_SLIDE', payload: newSlide });
         setNewSlide({ imageUrl: '', title: '', subtitle: '', link: '' });
     };
+    
+    const analytics = useMemo(() => {
+        const totalRevenue = state.orders
+            .filter(o => o.status === 'Delivered')
+            .reduce((sum, order) => sum + order.total, 0);
+        return {
+            totalRevenue: totalRevenue.toFixed(2),
+            totalOrders: state.orders.length,
+            pendingOrders: state.orders.filter(o => o.status === 'Pending').length,
+            totalUsers: state.users.length,
+            liveProducts: state.products.filter(p => p.isLive).length,
+        };
+    }, [state.orders, state.users, state.products]);
 
-    if (!isLoggedIn) {
+    if (!isAdminAuthenticated) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-secondary">
                 <div className="w-full max-w-md p-8 space-y-8 bg-primary rounded-lg shadow-lg">
@@ -72,23 +89,19 @@ const AdminPage: React.FC = () => {
             </div>
         );
     }
-    
-    const liveProductsCount = state.products.filter(p => p.isLive).length;
-    const pendingOrdersCount = state.orders.filter(o => o.status === 'Pending').length;
 
     return (
         <div className="min-h-screen bg-secondary text-white">
-            <header className="bg-primary p-4 flex justify-between items-center shadow-md">
+            <header className="bg-primary p-4 flex justify-between items-center shadow-md sticky top-0 z-10">
                 <h1 className="text-2xl font-bold">Admin Dashboard</h1>
                 <div className="flex items-center space-x-4">
-                    <p>Live Products: <span className="font-bold text-accent-cyan">{liveProductsCount}</span></p>
-                    <p>Pending Orders: <span className="font-bold text-accent-pink">{pendingOrdersCount}</span></p>
-                    <Link to="/" className="text-sm hover:underline">Back to Site</Link>
-                    <button onClick={() => setIsLoggedIn(false)} className="text-sm hover:underline">Logout</button>
+                    <Link to="/" className="text-sm bg-gray-700 px-3 py-1 rounded hover:bg-gray-600">Back to Site</Link>
+                    <button onClick={handleLogout} className="text-sm bg-accent-pink px-3 py-1 rounded hover:opacity-80">Logout</button>
                 </div>
             </header>
             <div className="p-4 md:p-8">
                 <div className="flex border-b border-gray-700 mb-6 overflow-x-auto">
+                    <button onClick={() => setActiveTab('dashboard')} className={`py-2 px-4 whitespace-nowrap ${activeTab === 'dashboard' ? 'border-b-2 border-accent-cyan text-accent-cyan' : 'text-gray-400'}`}>Dashboard</button>
                     <button onClick={() => setActiveTab('orders')} className={`py-2 px-4 whitespace-nowrap ${activeTab === 'orders' ? 'border-b-2 border-accent-cyan text-accent-cyan' : 'text-gray-400'}`}>Orders</button>
                     <button onClick={() => setActiveTab('products')} className={`py-2 px-4 whitespace-nowrap ${activeTab === 'products' ? 'border-b-2 border-accent-cyan text-accent-cyan' : 'text-gray-400'}`}>Products</button>
                     <button onClick={() => setActiveTab('users')} className={`py-2 px-4 whitespace-nowrap ${activeTab === 'users' ? 'border-b-2 border-accent-cyan text-accent-cyan' : 'text-gray-400'}`}>Users</button>
@@ -96,6 +109,15 @@ const AdminPage: React.FC = () => {
                     <button onClick={() => setActiveTab('hero')} className={`py-2 px-4 whitespace-nowrap ${activeTab === 'hero' ? 'border-b-2 border-accent-cyan text-accent-cyan' : 'text-gray-400'}`}>Hero Slides</button>
                 </div>
 
+                {activeTab === 'dashboard' && (
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="bg-primary p-6 rounded-lg text-center"><p className="text-3xl font-bold text-accent-cyan">${analytics.totalRevenue}</p><p className="text-gray-400">Total Revenue</p></div>
+                        <div className="bg-primary p-6 rounded-lg text-center"><p className="text-3xl font-bold">{analytics.totalOrders}</p><p className="text-gray-400">Total Orders</p></div>
+                        <div className="bg-primary p-6 rounded-lg text-center"><p className="text-3xl font-bold text-accent-pink">{analytics.pendingOrders}</p><p className="text-gray-400">Pending Orders</p></div>
+                        <div className="bg-primary p-6 rounded-lg text-center"><p className="text-3xl font-bold">{analytics.totalUsers}</p><p className="text-gray-400">Total Users</p></div>
+                    </div>
+                )}
+                
                 {activeTab === 'orders' && (
                      <div className="space-y-4 overflow-x-auto">
                         {state.orders.map(order => (
@@ -120,19 +142,20 @@ const AdminPage: React.FC = () => {
                     <div>
                         <button onClick={() => setShowAddProduct(!showAddProduct)} className="mb-4 bg-accent-cyan text-black font-bold py-2 px-4 rounded">{showAddProduct ? 'Cancel' : 'Add New Product'}</button>
                         {showAddProduct && (
-                            <form onSubmit={handleAddProductSubmit} className="bg-primary p-4 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                             <form onSubmit={handleAddProductSubmit} className="bg-primary p-6 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <h3 className="text-xl font-bold col-span-full mb-2">New Product Details</h3>
                                 <input type="text" placeholder="Name" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="bg-secondary p-2 rounded" required />
                                 <input type="number" placeholder="Price" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: parseFloat(e.target.value)})} className="bg-secondary p-2 rounded" required />
                                 <input type="text" placeholder="Category" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="bg-secondary p-2 rounded" required />
                                 <input type="number" placeholder="Stock" value={newProduct.stock} onChange={e => setNewProduct({...newProduct, stock: parseInt(e.target.value)})} className="bg-secondary p-2 rounded" required />
-                                <input type="text" placeholder="Image URL" onChange={e => setNewProduct({...newProduct, images: e.target.value.split(',')})} className="bg-secondary p-2 rounded col-span-1 md:col-span-2" required />
-                                <textarea placeholder="Description" value={newProduct.description} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="bg-secondary p-2 rounded col-span-1 md:col-span-2" required />
-                                <input type="text" placeholder="Tags (comma separated)" onChange={e => setNewProduct({...newProduct, tags: e.target.value.split(',')})} className="bg-secondary p-2 rounded" />
-                                <div className="flex items-center gap-2">
-                                    <input type="checkbox" id="isFeatured" checked={newProduct.isFeatured} onChange={e => setNewProduct({...newProduct, isFeatured: e.target.checked})} />
-                                    <label htmlFor="isFeatured">Featured?</label>
-                                </div>
-                                <button type="submit" className="bg-accent-pink py-2 px-4 rounded col-span-1 md:col-span-2">Save Product</button>
+                                <input type="number" placeholder="Discount Price (optional)" value={newProduct.discountPrice || ''} onChange={e => setNewProduct({...newProduct, discountPrice: parseFloat(e.target.value) || undefined})} className="bg-secondary p-2 rounded" />
+                                <div><label className="text-sm text-gray-400">Discount End Date</label><input type="date" onChange={e => setNewProduct({...newProduct, discountEndDate: new Date(e.target.value)})} className="bg-secondary p-2 rounded w-full" /></div>
+                                <input type="text" placeholder="Image URLs (comma separated)" onChange={e => setNewProduct({...newProduct, images: e.target.value})} className="bg-secondary p-2 rounded col-span-full" required />
+                                <textarea placeholder="Description" value={newProduct.description} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="bg-secondary p-2 rounded col-span-full" required />
+                                <textarea placeholder="Digital File Content (Code or Link)" value={newProduct.digitalFile} onChange={e => setNewProduct({...newProduct, digitalFile: e.target.value})} className="bg-secondary p-2 rounded col-span-full" required />
+                                <input type="text" placeholder="Tags (comma separated)" onChange={e => setNewProduct({...newProduct, tags: e.target.value})} className="bg-secondary p-2 rounded" />
+                                <div className="flex items-center gap-2"><input type="checkbox" id="isFeatured" checked={newProduct.isFeatured} onChange={e => setNewProduct({...newProduct, isFeatured: e.target.checked})} /><label htmlFor="isFeatured">Featured?</label></div>
+                                <button type="submit" className="bg-accent-pink py-2 px-4 rounded col-span-full">Save Product</button>
                             </form>
                         )}
                          <div className="overflow-x-auto">

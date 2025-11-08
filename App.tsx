@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useMemo } from 'react';
+import React, { useState, useReducer, useMemo, useEffect } from 'react';
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Product, AppState, AppContextType, Action, User } from './data';
 import { initialProducts, initialOrders, initialHeroSlides, initialUsers, initialProductRequests } from './data';
@@ -80,6 +80,8 @@ const appReducer = (state: AppState, action: Action): AppState => {
     case 'ADD_PRODUCT_REQUEST':
         const newRequest = { ...action.payload, id: Date.now(), date: new Date() };
         return { ...state, productRequests: [newRequest, ...state.productRequests] };
+    case 'SET_ADMIN_AUTH':
+        return { ...state, isAdminAuthenticated: action.payload };
     default:
       return state;
   }
@@ -115,18 +117,28 @@ const AppContent: React.FC = () => {
 
 
 const App: React.FC = () => {
-  const [initialState] = useState<AppState>({
-    products: initialProducts,
-    cart: [],
-    orders: initialOrders,
-    heroSlides: initialHeroSlides,
-    users: initialUsers,
-    productRequests: initialProductRequests,
-    isAuthenticated: false,
-    currentUser: null,
-  });
+    
+  const getInitialState = (): AppState => {
+      const adminAuth = localStorage.getItem('olala_admin_auth') === 'true';
+      return {
+        products: initialProducts,
+        cart: [],
+        orders: initialOrders,
+        heroSlides: initialHeroSlides,
+        users: initialUsers,
+        productRequests: initialProductRequests,
+        isAuthenticated: false,
+        currentUser: null,
+        isAdminAuthenticated: adminAuth,
+      };
+  };
 
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [state, dispatch] = useReducer(appReducer, getInitialState());
+
+  useEffect(() => {
+    localStorage.setItem('olala_admin_auth', state.isAdminAuthenticated.toString());
+  }, [state.isAdminAuthenticated]);
+
 
   const contextValue = useMemo(() => ({ state, dispatch }), [state, dispatch]);
 
