@@ -1,4 +1,3 @@
-
 import type { Dispatch } from 'react';
 
 export type Product = {
@@ -37,15 +36,44 @@ export type Order = {
   date: Date;
 };
 
+export type HeroSlide = {
+  id: number;
+  imageUrl: string;
+  title: string;
+  subtitle: string;
+  link: string;
+};
+
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  password?: string; // Should not be stored in frontend state in a real app
+};
+
+export type ProductRequest = {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  date: Date;
+};
+
 export type AppState = {
   products: Product[];
   cart: CartItem[];
   orders: Order[];
+  heroSlides: HeroSlide[];
+  users: User[];
+  productRequests: ProductRequest[];
+  isAuthenticated: boolean;
+  currentUser: User | null;
 };
 
 export type AppContextType = {
   state: AppState;
-  // Fix: Use Dispatch type from react.
   dispatch: Dispatch<Action>;
 };
 
@@ -58,7 +86,13 @@ export type Action =
   | { type: 'UPDATE_ORDER_STATUS'; payload: { orderId: string; status: Order['status'] } }
   | { type: 'ADD_PRODUCT'; payload: Product }
   | { type: 'UPDATE_PRODUCT'; payload: Product }
-  | { type: 'TOGGLE_PRODUCT_STATUS'; payload: number };
+  | { type: 'TOGGLE_PRODUCT_STATUS'; payload: number }
+  | { type: 'ADD_HERO_SLIDE'; payload: Omit<HeroSlide, 'id'> }
+  | { type: 'DELETE_HERO_SLIDE'; payload: number }
+  | { type: 'REGISTER_USER'; payload: User }
+  | { type: 'SET_CURRENT_USER'; payload: User | null }
+  | { type: 'LOGOUT' }
+  | { type: 'ADD_PRODUCT_REQUEST'; payload: Omit<ProductRequest, 'id' | 'date'> };
 
 
 export const initialProducts: Product[] = [
@@ -122,7 +156,7 @@ export const initialProducts: Product[] = [
         images: ['https://picsum.photos/seed/edu1/800/600', 'https://picsum.photos/seed/edu2/800/600'],
         category: 'Education',
         tags: ['Educational Combo', 'Learning'],
-        isFeatured: false,
+        isFeatured: true,
         isLive: true,
         stock: 100,
     },
@@ -163,14 +197,29 @@ export const initialOrders: Order[] = [
     }
 ];
 
+export const initialHeroSlides: HeroSlide[] = [
+    { id: 1, imageUrl: 'https://picsum.photos/seed/slide1/1200/600', title: 'Biggest Sale of the Year', subtitle: 'Get up to 50% off on all software packs!', link: '/shop' },
+    { id: 2, imageUrl: 'https://picsum.photos/seed/slide2/1200/600', title: 'New Arrivals: Gift Cards', subtitle: 'The perfect gift for any occasion.', link: '/shop' },
+    { id: 3, imageUrl: 'https://picsum.photos/seed/slide3/1200/600', title: 'Exclusive Graphics Bundles', subtitle: 'Unlock your creativity with our premium resources.', link: '/shop' },
+];
+
+export const initialUsers: User[] = [
+    { id: 1, name: 'Customer One', email: 'customer1@example.com', phone: '01111111111', address: 'Dhaka', password: 'password123' },
+    { id: 2, name: 'Customer Two', email: 'customer2@example.com', phone: '02222222222', address: 'Chittagong', password: 'password123' },
+];
+
+export const initialProductRequests: ProductRequest[] = [
+    { id: 1, name: 'Test User', email: 'test@example.com', message: 'I would love to see a pro-level audio editing suite available.', date: new Date() }
+];
+
 export const staticPageContent = {
   about: {
     title: "About OlalaDOT",
     content: "OlalaDOT was born from a simple idea: to bring the most unique and amazing digital products ('Gajab Jinis') to everyone. We are a team of passionate tech enthusiasts and digital curators dedicated to finding and offering the best subscriptions, software, graphics, and more. Our mission is to make premium digital goods accessible and affordable. We believe in quality, customer satisfaction, and the magic of a great find. Welcome to our 'Ajab Site'!"
   },
   contact: {
-    title: "Contact Us",
-    content: "Have a question or need support? We're here to help! Reach out to us via the form below or through our social media channels. Our team will get back to you as soon as possible."
+    title: "Contact Us & Product Request",
+    content: "Have a question, need support, or want to request a new product? We're here to help! Reach out to us via the form below or through our social media channels. Our team will get back to you as soon as possible."
   },
   faq: {
     title: "Frequently Asked Questions",

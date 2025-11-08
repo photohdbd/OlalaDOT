@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FacebookIcon, InstagramIcon, WhatsAppIcon } from './Icons';
@@ -48,6 +47,9 @@ const Footer: React.FC = () => {
                 </div>
                 <div className="mt-12 border-t border-gray-800 pt-8 text-center text-gray-500">
                     <p>&copy; {new Date().getFullYear()} OlalaDOT. All Rights Reserved.</p>
+                    <div className="mt-2">
+                        <Link to="/admin" className="text-xs text-gray-700 hover:text-gray-500 transition-colors">Admin</Link>
+                    </div>
                 </div>
             </div>
         </footer>

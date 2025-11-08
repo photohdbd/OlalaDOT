@@ -1,17 +1,28 @@
-
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../App';
-import { AppContextType, CartItem, Order } from '../data';
+import { AppContextType, Order } from '../data';
 import { TrashIcon } from '../components/Icons';
 
 const CheckoutPage: React.FC = () => {
     const { state, dispatch } = useContext(AppContext) as AppContextType;
-    const { cart } = state;
+    const { cart, currentUser } = state;
     const [paymentMethod, setPaymentMethod] = useState<'bKash' | 'Nagad' | 'Rocket' | 'Upay' | 'COD'>('bKash');
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [formData, setFormData] = useState({
         name: '', email: '', phone: '', address: '', transactionId: ''
     });
+
+    useEffect(() => {
+        if (currentUser) {
+            setFormData(prev => ({
+                ...prev,
+                name: currentUser.name || '',
+                email: currentUser.email || '',
+                phone: currentUser.phone || '',
+                address: currentUser.address || '',
+            }));
+        }
+    }, [currentUser]);
 
     const handleQuantityChange = (productId: number, quantity: number) => {
         dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
@@ -101,10 +112,10 @@ const CheckoutPage: React.FC = () => {
                         <div className="bg-secondary p-6 rounded-lg">
                             <h2 className="text-2xl font-bold mb-6">Checkout Details</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
-                                <input type="text" name="name" placeholder="Full Name" onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
-                                <input type="email" name="email" placeholder="Email Address" onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
-                                <input type="tel" name="phone" placeholder="Mobile Number" onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
-                                <input type="text" name="address" placeholder="Address" onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
+                                <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
+                                <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
+                                <input type="tel" name="phone" placeholder="Mobile Number" value={formData.phone} onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
+                                <input type="text" name="address" placeholder="Address" value={formData.address} onChange={handleInputChange} required className="w-full bg-primary p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-pink" />
                                 
                                 <h3 className="font-semibold pt-4">Payment Method</h3>
                                 <div className="grid grid-cols-2 gap-2">

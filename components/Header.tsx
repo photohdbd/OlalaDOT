@@ -1,4 +1,3 @@
-
 import React, { useContext, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { AppContext } from '../App';
@@ -29,7 +28,7 @@ const Header: React.FC = () => {
                     </nav>
                     <div className="flex items-center space-x-4">
                         <div className="hidden md:flex items-center space-x-4">
-                            <Link to="/admin" className="p-2 text-white hover:text-accent-pink transition-colors">
+                            <Link to="/account" className="p-2 text-white hover:text-accent-pink transition-colors" title={state.isAuthenticated ? 'My Account' : 'Login/Register'}>
                                 <UserIcon />
                             </Link>
                             <Link to="/checkout" className="relative p-2 text-white hover:text-accent-cyan transition-colors">
@@ -56,7 +55,7 @@ const Header: React.FC = () => {
                         <NavLink to="/shop" className={navLinkClasses} onClick={() => setIsMenuOpen(false)}>Shop</NavLink>
                         <NavLink to="/contact" className={navLinkClasses} onClick={() => setIsMenuOpen(false)}>Product Request</NavLink>
                         <div className="flex items-center space-x-4 pt-4">
-                            <Link to="/admin" className="p-2 text-white hover:text-accent-pink transition-colors" onClick={() => setIsMenuOpen(false)}>
+                            <Link to="/account" className="p-2 text-white hover:text-accent-pink transition-colors" onClick={() => setIsMenuOpen(false)}>
                                 <UserIcon />
                             </Link>
                             <Link to="/checkout" className="relative p-2 text-white hover:text-accent-cyan transition-colors" onClick={() => setIsMenuOpen(false)}>
